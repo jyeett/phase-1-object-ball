@@ -2,7 +2,7 @@ const gameObject = () => {
     const obj = {
         "home": {
             "teamName": "Brooklyn Nets",
-            "colors": "Black, White",
+            "colors": ["Black", "White"],
             "players": {
                 "Alan Anderson": {
                     "number": "0",
@@ -58,7 +58,7 @@ const gameObject = () => {
         },
         "away": {
             "teamName": "Charlotte Hornets",
-            "colors": "Turquoise, Purple",
+            "colors": ["Turquoise", "Purple"],
             "players": {
                 "Jeff Adrien": {
                     "number": "4",
@@ -118,15 +118,76 @@ const gameObject = () => {
 console.log(gameObject());
 const game = gameObject();
 
-function numPointsScored(name) {
+function getPlayer(name) {
     for (const team in game) {
         let players = game[team]["players"];
         let player = Object.keys(players).find(p => p === name);
         if (player) {
-            return players[player]['points'];
+            return players[player];
         }
     }
     return "Player not found.";
 }
 
-console.log(numPointsScored("Bismak Biyombo"));
+function numPointsScored(name) {
+    return getPlayer(name)["points"];
+}
+
+function shoeSize(name) {
+    return getPlayer(name)["shoe"];
+}
+
+function teamColors(teamName) {
+    for (const team in game) {
+        let teamStats = game[team];
+        if (teamStats["teamName"] === teamName) {
+            return teamStats["colors"];
+        }
+    }
+    return "Team not found.";
+}
+
+function teamNames() {
+    let teams = [];
+    for (const team in game) {
+        teams.push(game[team]["teamName"]);
+    }
+    return teams;
+}
+
+function playerNumbers(teamName) {
+    let playerNums = [];
+    for (const team in game) {
+        let teamStats = game[team];
+        if (teamStats["teamName"] === teamName) {
+            const players = teamStats["players"];
+            for (const player in players) {
+                playerNums.push(players[player]["number"])
+            }
+            return playerNums;
+        }
+    }
+    return "Team not found.";
+}
+
+function playerStats(name) {
+    return getPlayer(name);
+}
+
+function bigShoeRebounds() {
+    let shoeSize = [];
+    let playersArr = [];
+    for (const team in game) {
+        const teamStats = game[team];
+        const players = teamStats["players"];
+        for (const player in players) {
+            const playerObj = players[player];
+            shoeSize.push(playerObj["shoe"]);
+            playersArr.push(playerObj);
+        }
+    }
+    const largestShoe = Math.max(...shoeSize);
+    return playersArr.find(p => p["shoe"] == largestShoe)["rebounds"];
+}
+
+console.log(bigShoeRebounds());
