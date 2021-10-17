@@ -115,26 +115,14 @@ const gameObject = () => {
     }
     return obj;
 }
-console.log(gameObject());
 const game = gameObject();
 
-function getPlayer(name) {
-    for (const team in game) {
-        let players = game[team]["players"];
-        let player = Object.keys(players).find(p => p === name);
-        if (player) {
-            return players[player];
-        }
-    }
-    return "Player not found.";
-}
-
 function numPointsScored(name) {
-    return getPlayer(name)["points"];
+    return playerStats(name)["points"];
 }
 
 function shoeSize(name) {
-    return getPlayer(name)["shoe"];
+    return playerStats(name)["shoe"];
 }
 
 function teamColors(teamName) {
@@ -171,15 +159,21 @@ function playerNumbers(teamName) {
 }
 
 function playerStats(name) {
-    return getPlayer(name);
+    for (const team in game) {
+        let players = game[team]["players"];
+        let player = Object.keys(players).find(p => p === name);
+        if (player) {
+            return players[player];
+        }
+    }
+    return "Player not found.";
 }
 
 function bigShoeRebounds() {
     let shoeSize = [];
     let playersArr = [];
     for (const team in game) {
-        const teamStats = game[team];
-        const players = teamStats["players"];
+        const players = game[team]["players"];
         for (const player in players) {
             const playerObj = players[player];
             shoeSize.push(playerObj["shoe"]);
@@ -190,4 +184,90 @@ function bigShoeRebounds() {
     return playersArr.find(p => p["shoe"] == largestShoe)["rebounds"];
 }
 
-console.log(bigShoeRebounds());
+function mostPointsScored() {
+    let pointsArr = [];
+    let playersArr = [];
+    let namesArr = [];
+    for (const team in game) {
+        const players = game[team]["players"];
+        for (const player in players) {
+            const playerObj = players[player];
+            pointsArr.push(playerObj["points"]);
+            playersArr.push(playerObj);
+        }
+        namesArr.push(players);
+    }
+    const mostPoints = Math.max(...pointsArr);
+    const pointsStats = playersArr.find(p => p["points"] == mostPoints);
+    for (const i in namesArr) {
+        const keyObj = namesArr[i];
+        const playerWithPoints = Object.keys(keyObj).find(n => keyObj[n] === pointsStats);
+        if (playerWithPoints) {
+            return playerWithPoints;
+        }
+    }
+    return "No players available";
+}
+
+function winningTeam() {
+    let playersArr = [];
+    let finalScore = [];
+    let currTeam;
+
+    for (const team in game) {
+        const players = game[team]["players"];
+        currTeam = game[team]["teamName"]
+        playersArr.push([currTeam, players]);
+    }
+    for (const i in playersArr) {
+        const playerStats = Object.values(playersArr[i][1])
+        let totalPoints = 0;
+        for (const p in playerStats) {
+            totalPoints += parseInt(playerStats[p]["points"])
+        }
+        finalScore.push([playersArr[i][0], totalPoints]);
+    }
+    let higherScore = 0;
+    let winner;
+    for (const score of finalScore) {
+        if (score[1] > higherScore) {
+            higherScore = score[1];
+            winner = score[0];
+        }
+    }
+    return winner;
+}
+
+function playerWithLongestName() {
+    let playersArr = [];
+    for (const team in game) {
+        const players = game[team]["players"];
+        for (const player in players) {
+            playersArr.push(player);
+        }
+    }
+    let longestName;
+    let longestNameLen = 0;
+    for (const name of playersArr) {
+        if (name.length > longestNameLen) {
+            longestNameLen = name.length;
+            longestName = name;
+        }
+    }
+    return longestName;
+}
+
+function doesLongNameStealATon() {
+    longNameSteals = playerStats(playerWithLongestName())["steals"];
+    let numSteals = [];
+    for (const team in game) {
+        const players = game[team]["players"];
+        for (const player in players) {
+            const playerObj = players[player];
+            numSteals.push(playerObj["steals"]);
+        }
+    }
+    return longNameSteals == Math.max(...numSteals);
+}
+
+console.log(doesLongNameStealATon());
